@@ -5,7 +5,7 @@
 
 export const config = {
   // --- Hero / Landing ---
-  heroTitle: "Happy Valentine's Day, Wenwen!",
+  heroTitle: "Happy Early Valentines, Wenwen!",
   heroSubtitle: "Thanks for always being there for me kubb :DD",
 
   // --- Countdown ---
