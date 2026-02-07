@@ -1,0 +1,123 @@
+.timeline {
+  background-color: var(--color-white);
+}
+
+.timeline__container {
+  position: relative;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: var(--spacing-sm) 0;
+}
+
+/* Vertical line */
+.timeline__line {
+  position: absolute;
+  left: 20px;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: linear-gradient(
+    to bottom,
+    var(--color-accent),
+    var(--color-primary),
+    var(--color-accent)
+  );
+}
+
+.timeline__item {
+  position: relative;
+  padding-left: 52px;
+  margin-bottom: var(--spacing-lg);
+}
+
+/* Dot on the line */
+.timeline__dot {
+  position: absolute;
+  left: 12px;
+  top: 24px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background-color: var(--color-primary);
+  border: 3px solid var(--color-white);
+  box-shadow: 0 0 0 3px var(--color-accent);
+  z-index: 1;
+}
+
+.timeline__card {
+  background: var(--color-white);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.timeline__card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 40px rgba(230, 57, 70, 0.2);
+}
+
+.timeline__photo {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  background-color: var(--color-accent);
+}
+
+.timeline__card-body {
+  padding: var(--spacing-sm) var(--spacing-md);
+}
+
+.timeline__date {
+  display: inline-block;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--color-white);
+  background-color: var(--color-primary);
+  padding: 0.2rem 0.7rem;
+  border-radius: 20px;
+  margin-bottom: var(--spacing-xs);
+}
+
+.timeline__card-title {
+  color: var(--color-primary);
+  margin-bottom: 0.3rem;
+}
+
+.timeline__card-desc {
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: #555;
+}
+
+/* Desktop: alternating layout */
+@media (min-width: 900px) {
+  .timeline__line {
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  .timeline__item {
+    width: 50%;
+    padding-left: 0;
+  }
+
+  .timeline__item--left {
+    padding-right: 40px;
+    text-align: right;
+  }
+
+  .timeline__item--left .timeline__dot {
+    left: auto;
+    right: -9px;
+  }
+
+  .timeline__item--right {
+    margin-left: 50%;
+    padding-left: 40px;
+  }
+
+  .timeline__item--right .timeline__dot {
+    left: -9px;
+  }
+}

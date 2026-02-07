@@ -1,0 +1,29 @@
+:root {
+  /* Colors (overridden at runtime from config.theme) */
+  --color-primary: #e63946;
+  --color-secondary: #ff6b81;
+  --color-accent: #ffd6e0;
+  --color-bg: #fff0f3;
+  --color-text: #2b2b2b;
+  --color-white: #ffffff;
+
+  /* Fonts */
+  --font-heading: "Playfair Display", Georgia, serif;
+  --font-body: "Lato", -apple-system, BlinkMacSystemFont, sans-serif;
+
+  /* Spacing */
+  --spacing-xs: 0.5rem;
+  --spacing-sm: 1rem;
+  --spacing-md: 2rem;
+  --spacing-lg: 4rem;
+  --spacing-xl: 6rem;
+
+  /* Border radius */
+  --radius-sm: 8px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+
+  /* Shadows */
+  --shadow-soft: 0 4px 20px rgba(230, 57, 70, 0.1);
+  --shadow-card: 0 8px 32px rgba(230, 57, 70, 0.15);
+}
