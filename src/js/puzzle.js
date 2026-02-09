@@ -30,6 +30,32 @@ export function initPuzzle() {
             <span class="puzzle__stat-value" id="move-count">0</span>
           </span>
         </div>
+
+        <div class="puzzle__direction-pad" id="direction-pad" hidden>
+          <button class="puzzle__direction-btn puzzle__direction-btn--up" data-direction="up" aria-label="Move up">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor">
+              <path d="M18 15l-6-6-6 6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+          <div class="puzzle__direction-row">
+            <button class="puzzle__direction-btn puzzle__direction-btn--left" data-direction="left" aria-label="Move left">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor">
+                <path d="M15 18l-6-6 6-6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </button>
+            <button class="puzzle__direction-btn puzzle__direction-btn--right" data-direction="right" aria-label="Move right">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor">
+                <path d="M9 18l6-6-6-6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </button>
+          </div>
+          <button class="puzzle__direction-btn puzzle__direction-btn--down" data-direction="down" aria-label="Move down">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor">
+              <path d="M6 9l6 6 6-6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+        </div>
+
         <button class="puzzle__reset-btn" id="puzzle-reset">
           <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" fill="none">
             <path d="M1 4v6h6M23 20v-6h-6"></path>
@@ -63,6 +89,8 @@ function initGame() {
   let moveCount = 0;
   let isWon = false;
   let mode = config.puzzle.defaultMode || "easy"; // "easy" or "hard"
+  let selectedTileIndex = null; // Track selected tile for directional mode
+  const directionalMode = config.puzzle?.directionalControls || "off";
 
   // Cache DOM elements
   const board = document.querySelector(".puzzle__board");
@@ -151,13 +179,188 @@ function initGame() {
     return adjacent.filter(pos => emptyIndices.includes(pos));
   }
 
+  // Get direction from tile to empty position
+  function getDirection(fromIndex, toIndex) {
+    if (toIndex === fromIndex - gridSize) return "up";
+    if (toIndex === fromIndex + gridSize) return "down";
+    if (toIndex === fromIndex - 1) return "left";
+    if (toIndex === fromIndex + 1) return "right";
+    return null;
+  }
+
+  // Get position from tile in given direction
+  function getPositionInDirection(tileIndex, direction) {
+    const row = Math.floor(tileIndex / gridSize);
+    const col = tileIndex % gridSize;
+
+    switch(direction) {
+      case "up":
+        return row > 0 ? tileIndex - gridSize : null;
+      case "down":
+        return row < gridSize - 1 ? tileIndex + gridSize : null;
+      case "left":
+        return col > 0 ? tileIndex - 1 : null;
+      case "right":
+        return col < gridSize - 1 ? tileIndex + 1 : null;
+      default:
+        return null;
+    }
+  }
+
+  // Update directional button states
+  function updateDirectionButtons() {
+    if (directionalMode === "off") return;
+
+    const directionPad = document.getElementById("direction-pad");
+    const buttons = directionPad.querySelectorAll(".puzzle__direction-btn");
+
+    if (selectedTileIndex === null) {
+      // No tile selected - disable all buttons
+      buttons.forEach(btn => {
+        btn.disabled = true;
+      });
+      directionPad.hidden = true;
+      return;
+    }
+
+    // Show direction pad
+    directionPad.hidden = false;
+
+    // Get valid moves for selected tile
+    const validEmptyPositions = getValidMoves(selectedTileIndex);
+    const validDirections = validEmptyPositions.map(pos =>
+      getDirection(selectedTileIndex, pos)
+    );
+
+    // Enable/disable buttons based on valid moves
+    buttons.forEach(btn => {
+      const direction = btn.dataset.direction;
+      btn.disabled = !validDirections.includes(direction);
+    });
+  }
+
+  // Clear tile selection
+  function clearSelection() {
+    if (selectedTileIndex !== null) {
+      const prevTile = board.querySelector(`[data-index="${selectedTileIndex}"]`);
+      if (prevTile) {
+        prevTile.classList.remove("puzzle__tile--selected");
+      }
+      selectedTileIndex = null;
+      updateDirectionButtons();
+    }
+  }
+
+  // Select a tile
+  function selectTile(index) {
+    // Don't allow selecting empty tiles
+    const isEmpty = emptyIndices.includes(index);
+    if (isEmpty) {
+      clearSelection();
+      return;
+    }
+
+    // Clear previous selection
+    clearSelection();
+
+    // Set new selection
+    selectedTileIndex = index;
+    const tile = board.querySelector(`[data-index="${index}"]`);
+    if (tile) {
+      tile.classList.add("puzzle__tile--selected");
+    }
+
+    updateDirectionButtons();
+  }
+
+  // Move selected tile in direction
+  function moveInDirection(direction) {
+    if (selectedTileIndex === null) return;
+
+    const targetPos = getPositionInDirection(selectedTileIndex, direction);
+    if (targetPos === null) return;
+
+    // Check if target position is empty
+    if (!emptyIndices.includes(targetPos)) return;
+
+    // Perform the move
+    [tiles[selectedTileIndex], tiles[targetPos]] = [tiles[targetPos], tiles[selectedTileIndex]];
+
+    // Update emptyIndices array
+    const emptyIndexInArray = emptyIndices.indexOf(targetPos);
+    emptyIndices[emptyIndexInArray] = selectedTileIndex;
+
+    moveCount++;
+
+    // Clear selection
+    clearSelection();
+
+    // Update UI
+    renderBoard();
+    moveCountEl.textContent = moveCount;
+
+    // Check win
+    if (checkWin()) {
+      handleWin();
+    }
+  }
+
   // Handle tile click
   function handleTileClick(index) {
     if (isWon) return;
 
+    const isEmpty = emptyIndices.includes(index);
+
+    // Hybrid or required mode
+    if (directionalMode === "hybrid" || directionalMode === "required") {
+      if (isEmpty) {
+        // Clicking empty tile clears selection
+        clearSelection();
+        return;
+      }
+
+      const adjacentEmptyTiles = getValidMoves(index);
+
+      if (adjacentEmptyTiles.length === 0) {
+        // Invalid tile - shake and clear selection
+        clearSelection();
+        const tileEl = board.querySelector(`[data-index="${index}"]`);
+        if (tileEl) {
+          tileEl.classList.add("puzzle__tile--invalid");
+          setTimeout(() => tileEl.classList.remove("puzzle__tile--invalid"), 300);
+        }
+        return;
+      }
+
+      // In hybrid mode, allow direct click if only one move available
+      if (directionalMode === "hybrid" && adjacentEmptyTiles.length === 1) {
+        const emptyPos = adjacentEmptyTiles[0];
+        [tiles[index], tiles[emptyPos]] = [tiles[emptyPos], tiles[index]];
+
+        const emptyIndexInArray = emptyIndices.indexOf(emptyPos);
+        emptyIndices[emptyIndexInArray] = index;
+
+        moveCount++;
+        clearSelection();
+        renderBoard();
+        moveCountEl.textContent = moveCount;
+
+        if (checkWin()) {
+          handleWin();
+        }
+        return;
+      }
+
+      // Multiple moves available or required mode - select tile
+      selectTile(index);
+      return;
+    }
+
+    // Original behavior for "off" mode
+    if (isEmpty) return;
+
     const adjacentEmptyTiles = getValidMoves(index);
     if (adjacentEmptyTiles.length === 0) {
-      // Invalid move - add shake animation
       const tileEl = board.querySelector(`[data-index="${index}"]`);
       if (tileEl) {
         tileEl.classList.add("puzzle__tile--invalid");
@@ -166,21 +369,17 @@ function initGame() {
       return;
     }
 
-    // Swap tile with the first adjacent empty tile
+    // Auto-move to first valid direction
     const emptyPos = adjacentEmptyTiles[0];
     [tiles[index], tiles[emptyPos]] = [tiles[emptyPos], tiles[index]];
 
-    // Update emptyIndices array
     const emptyIndexInArray = emptyIndices.indexOf(emptyPos);
     emptyIndices[emptyIndexInArray] = index;
 
     moveCount++;
-
-    // Update UI
     renderBoard();
     moveCountEl.textContent = moveCount;
 
-    // Check win
     if (checkWin()) {
       handleWin();
     }
@@ -269,6 +468,7 @@ function initGame() {
     winOverlay.hidden = true;
     winOverlay.classList.remove("puzzle__win--show");
 
+    clearSelection();
     updateModeButtons();
     renderBoard();
   }
@@ -296,5 +496,17 @@ function initGame() {
   modeButtons.forEach(btn => {
     btn.addEventListener("click", () => handleModeSwitch(btn.dataset.mode));
   });
+
+  // Direction button listeners
+  if (directionalMode !== "off") {
+    const directionButtons = document.querySelectorAll(".puzzle__direction-btn");
+    directionButtons.forEach(btn => {
+      btn.addEventListener("click", () => {
+        const direction = btn.dataset.direction;
+        moveInDirection(direction);
+      });
+    });
+  }
+
   resetGame();
 }

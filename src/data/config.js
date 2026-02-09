@@ -24,7 +24,8 @@ export const config = {
     image: "/photos/puzzle_photo.PNG",
     showPreview: false,
     defaultMode: "easy", // "easy" (2 blanks) or "hard" (1 blank)
-    winMessage: "You did it! Just like we fit together perfectly ❤️",
+    directionalControls: "hybrid", // "off" | "hybrid" | "required"
+    winMessage: "Geng makkk!",
     winSubtitle: "You solved it in {moves} moves!"
   },
 

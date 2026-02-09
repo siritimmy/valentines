@@ -111,12 +111,24 @@
 }
 
 .puzzle__controls {
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
   align-items: center;
-  justify-content: space-between;
   gap: var(--spacing-sm);
   max-width: 400px;
   margin: 0 auto;
+}
+
+.puzzle__stats {
+  justify-self: start;
+}
+
+.puzzle__direction-pad {
+  justify-self: center;
+}
+
+.puzzle__reset-btn {
+  justify-self: end;
 }
 
 .puzzle__stats {
@@ -172,6 +184,63 @@
 
 .puzzle__reset-btn svg {
   stroke-width: 2.5;
+}
+
+/* Directional control pad */
+.puzzle__direction-pad {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: auto auto auto;
+  gap: 0.25rem;
+  justify-items: center;
+}
+
+.puzzle__direction-row {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.puzzle__direction-btn {
+  width: 44px;
+  height: 44px;
+  background: rgba(255, 255, 255, 0.15);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: var(--radius-sm);
+  color: var(--color-white);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.puzzle__direction-btn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.25);
+  border-color: rgba(255, 255, 255, 0.5);
+  transform: translateY(-1px);
+}
+
+.puzzle__direction-btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.puzzle__direction-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+.puzzle__direction-btn svg {
+  stroke-width: 2.5;
+}
+
+/* Selected tile highlight */
+.puzzle__tile--selected {
+  background-color: rgba(255, 255, 255, 0.45) !important;
+  border: 3px solid rgba(255, 255, 255, 0.8);
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+  transform: scale(1.05);
 }
 
 .puzzle__win {
@@ -255,6 +324,11 @@
   .puzzle__controls {
     max-width: 500px;
   }
+
+  .puzzle__direction-btn {
+    width: 48px;
+    height: 48px;
+  }
 }
 
 /* Desktop responsive */
@@ -266,5 +340,14 @@
   .puzzle__board {
     max-width: 600px;
     gap: 12px;
+  }
+
+  .puzzle__controls {
+    max-width: 600px;
+  }
+
+  .puzzle__direction-btn {
+    width: 52px;
+    height: 52px;
   }
 }
