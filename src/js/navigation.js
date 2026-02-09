@@ -2,6 +2,7 @@ const sections = [
   { id: "hero", label: "Home" },
   { id: "timeline", label: "Our Story" },
   { id: "countdown", label: "Countdown" },
+  { id: "puzzle", label: "Puzzle" },
 ];
 
 export function initNavigation() {

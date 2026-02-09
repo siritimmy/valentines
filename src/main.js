@@ -7,6 +7,7 @@ import "./styles/base.css";
 import "./styles/hero.css";
 import "./styles/timeline.css";
 import "./styles/countdown.css";
+import "./styles/puzzle.css";
 import "./styles/animations.css";
 
 // Modules
@@ -14,6 +15,7 @@ import { initNavigation } from "./js/navigation.js";
 import { initHero } from "./js/hero.js";
 import { initTimeline } from "./js/timeline.js";
 import { initCountdown } from "./js/countdown.js";
+import { initPuzzle } from "./js/puzzle.js";
 import { initFloatingHearts, initScrollReveal } from "./js/animations.js";
 
 // Apply theme color overrides from config
@@ -35,6 +37,7 @@ initNavigation();
 initHero();
 initTimeline();
 initCountdown();
+initPuzzle();
 initFloatingHearts();
 
 // Scroll reveal runs after all sections have rendered their [data-reveal] elements

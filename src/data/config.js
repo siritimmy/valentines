@@ -16,6 +16,18 @@ export const config = {
     expiredMessage: "You're finally here!",
   },
 
+  // --- Puzzle Game ---
+  puzzle: {
+    enabled: true,
+    title: "Puzzlee!",
+    gridSize: 3,
+    image: "/photos/puzzle_photo.PNG",
+    showPreview: false,
+    defaultMode: "easy", // "easy" (2 blanks) or "hard" (1 blank)
+    winMessage: "You did it! Just like we fit together perfectly ❤️",
+    winSubtitle: "You solved it in {moves} moves!"
+  },
+
   // --- Timeline / Our Story ---
   // Add as many memories as you want. Put photos in /public/photos/
   timeline: [
